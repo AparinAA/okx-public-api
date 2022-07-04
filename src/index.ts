@@ -215,8 +215,8 @@ export default class OKXclient {
     const bodyTransfer = {
       ccy: currency,
       amt: amount,
-      from: from,
-      to: to,
+      from,
+      to,
     };
     return this.postRequest('/api/v5/asset/transfer', bodyTransfer).catch(() => {
       return Promise.reject({ error: 'bad POST request transfer', code: -1, ex: 'OKX' });
@@ -232,10 +232,10 @@ export default class OKXclient {
     // body for withdrawal
     const bodyWithdrawal = {
       amt: '' + amount,
-      fee: fee,
+      fee,
       dest: '4',
       ccy: currency,
-      chain: chain,
+      chain,
       toAddr: address,
     };
     return this.postRequest('/api/v5/asset/withdrawal', bodyWithdrawal).catch(() => {

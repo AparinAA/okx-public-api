@@ -1,6 +1,6 @@
 {
   "name": "okx-public-api",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "open api for connect to OKEX",
   "main": "prod/index.js",
   "types": "prod/index.d.ts",
@@ -32,6 +32,8 @@
   "license": "MIT",
   "devDependencies": {
     "@types/jest": "^28.1.4",
+    "axios": "^0.27.2",
+    "dotenv": "^16.0.1",
     "jest": "^28.1.2",
     "prettier": "^2.7.1",
     "ts-jest": "^28.0.5",

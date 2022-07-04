@@ -25,114 +25,113 @@ export default class OKXclient {
 
   constructor(apiKey: string, apiSecret: string, passphrase: string) {
     this.instance = axios.create({
-            baseURL: 'https://www.okex.com',
-            timeout: 5000,
-            headers: {
-            accept: 'application/json',
-            'Content-Type': 'application/json; utf-8',
-            'OK-ACCESS-KEY': apiKey,
-            'OK-ACCESS-PASSPHRASE': passphrase,
-        },
+      baseURL: 'https://www.okex.com',
+      timeout: 5000,
+      headers: {
+        accept: 'application/json',
+        'Content-Type': 'application/json; utf-8',
+        'OK-ACCESS-KEY': apiKey,
+        'OK-ACCESS-PASSPHRASE': passphrase,
+      },
     });
 
     this.instance.interceptors.request.use((config: any) => {
-        const now = new Date().toISOString();
-        const method = config.method.toUpperCase();
-        let { data, params } = config;
-        let sign: string;
+      const now = new Date().toISOString();
+      const method = config.method.toUpperCase();
+      let { data, params } = config;
+      let sign: string;
 
-        if (!data) {
-            data = '';
-        } else {
-            data = JSON.stringify(data);
-        }
+      if (!data) {
+        data = '';
+      } else {
+        data = JSON.stringify(data);
+      }
 
-        params = new URLSearchParams(params).toString();
+      params = new URLSearchParams(params).toString();
 
-        sign = crypto
-            .createHmac('sha256', apiSecret)
-            .update(
-            now + method.toUpperCase() + `${config.url}` + (method === 'GET' ? (params ? `?${params}` : ``) : `${data}`),
-            )
-            .digest('base64');
+      sign = crypto
+        .createHmac('sha256', apiSecret)
+        .update(
+          now + method.toUpperCase() + `${config.url}` + (method === 'GET' ? (params ? `?${params}` : ``) : `${data}`),
+        )
+        .digest('base64');
 
-        config.headers['OK-ACCESS-TIMESTAMP'] = now;
+      config.headers['OK-ACCESS-TIMESTAMP'] = now;
 
-        config.headers['OK-ACCESS-SIGN'] = sign;
+      config.headers['OK-ACCESS-SIGN'] = sign;
 
-        return config;
+      return config;
     });
   }
 
-    getName() {
-        return Promise.resolve('OKX');
+  getName() {
+    return Promise.resolve('OKX');
+  }
+
+  // GET request
+  getRequest(endpoint: string, params: {} = {}) {
+    return this.instance
+      .get(endpoint, { params })
+      .then(
+        (result: any) => {
+          return result?.data.data[0] ?? Promise.reject({ error: 'bad GET request first step', code: -1, ex: 'OKX' });
+        },
+        (e: any) => {
+          return Promise.reject({ error: 'bad GET request first step', code: -1, ex: 'OKX' });
+        },
+      )
+      .catch(() => {
+        return Promise.reject({ error: 'bad GET request first step', code: -1, ex: 'OKX' });
+      });
+  }
+
+  // POST request
+  postRequest(endpoint: string, data: {} = {}) {
+    return this.instance.post(endpoint, data).catch(() => {
+      return Promise.reject({ error: 'bad POST request first step', code: -1, ex: 'OKX' });
+    });
+  }
+
+  // Get balance account
+  // return list of object [ {'ccy': ccy, 'avail': amountAvailble, 'eqUsd', equelUsd} ]
+  getBalance() {
+    interface Details {
+      ccy: string;
+      frozenBal: string | number;
+      availEq: string | number;
+      eqUsd: string | number;
+    }
+    interface Balance {
+      details: Details[];
     }
 
-    // GET request
-    getRequest(endpoint: string, params: {} = {}) {
-        return this.instance
-            .get(endpoint, { params })
-            .then(
-            (result: any) => {
-                return result?.data.data[0] ?? Promise.reject({ error: 'bad GET request first step', code: -1, ex: 'OKX' });
-            },
-            (e:any) => {
-                return Promise.reject({ error: 'bad GET request first step', code: -1, ex: 'OKX' });
-            },
-            )
-            .catch(() => {
-                return Promise.reject({ error: 'bad GET request first step', code: -1, ex: 'OKX' });
-            });
-    }
+    return this.getRequest('/api/v5/account/balance')
+      .then(
+        (balance: any | Balance): balanceInfo | any => {
+          if (balance?.code === -1) {
+            return Promise.reject({ error: 'bad GET request balance check', code: -1, ex: 'OKX' });
+          }
 
-    // POST request
-    postRequest(endpoint: string, data: {} = {}) {
-        return this.instance.post(endpoint, data).catch(() => {
-            return Promise.reject({ error: 'bad POST request first step', code: -1, ex: 'OKX' });
-        });
-    }
+          return (
+            balance?.details.map((element: Details) => {
+              return {
+                ccy: element.ccy,
+                avail: element.availEq,
+                eqUsd: element.eqUsd,
+              };
+            }) ?? Promise.reject({ error: 'bad GET request balance check', code: -1, ex: 'OKX' })
+          );
+        },
+        () => {
+          return Promise.reject({ error: 'bad GET request balance check', code: -1, ex: 'OKX' });
+        },
+      )
+      .catch(() => {
+        return Promise.reject({ error: 'bad GET request balance check', code: -1, ex: 'OKX' });
+      });
+  }
 
-    // Get balance account
-    // return list of object [ {'ccy': ccy, 'avail': amountAvailble, 'eqUsd', equelUsd} ]
-    getBalance() {
-        interface Details {
-            ccy: string;
-            frozenBal: string | number;
-            availEq: string | number;
-            eqUsd: string | number;
-        }
-        interface Balance {
-            details: Details[];
-        }
-
-        return this.getRequest('/api/v5/account/balance')
-            .then(
-            (balance: any | Balance): balanceInfo | any => {
-                
-                if (balance?.code === -1) {
-                    return Promise.reject({ error: 'bad GET request balance check', code: -1, ex: 'OKX' });
-                }
-
-                return (
-                    balance?.details.map((element: Details) => {
-                        return {
-                        ccy: element.ccy,
-                        avail: element.availEq,
-                        eqUsd: element.eqUsd,
-                        };
-                    }) ?? Promise.reject({ error: 'bad GET request balance check', code: -1, ex: 'OKX' })
-                );
-            },
-            () => {
-                return Promise.reject({ error: 'bad GET request balance check', code: -1, ex: 'OKX' });
-            },
-            )
-            .catch(() => {
-                return Promise.reject({ error: 'bad GET request balance check', code: -1, ex: 'OKX' });
-            });
-    }
-
-    /*Get market price with any depth < 400
+  /*Get market price with any depth < 400
     instId='TON-USDT', depth=int
     return object 
     {
@@ -140,31 +139,31 @@ export default class OKXclient {
         'bid': [[priceBid1, amountBid1], [priceBid2, amountBid2], ...]
     }
     */
-    getMarket(instId: string, sz: number | null = null) {
-        return this.getRequest(`/api/v5/market/books`, { instId, sz })
-        .then(
-            (orderbook: Orderbook | any) => {
-                if (orderbook?.code === -1) {
-                    return Promise.reject({ error: 'bad GET request balance check', code: -1, ex: 'OKX' });
-                }
+  getMarket(instId: string, sz: number | null = null) {
+    return this.getRequest(`/api/v5/market/books`, { instId, sz })
+      .then(
+        (orderbook: Orderbook | any) => {
+          if (orderbook?.code === -1) {
+            return Promise.reject({ error: 'bad GET request balance check', code: -1, ex: 'OKX' });
+          }
 
-                if (!orderbook.asks || !orderbook.bids) {
-                    return Promise.reject({ error: 'bad GET request orderbook check', code: -1, ex: 'OKX' });
-                }
-
-                return {
-                    asks: orderbook.asks.map((item: []) => item.splice(0, 2)),
-                    bids: orderbook.bids.map((item: []) => item.splice(0, 2)),
-                };
-            },
-            () => {
-                return Promise.reject({ error: 'bad GET request orderbook check', code: -1, ex: 'OKX' });
-            },
-        )
-        .catch(() => {
+          if (!orderbook.asks || !orderbook.bids) {
             return Promise.reject({ error: 'bad GET request orderbook check', code: -1, ex: 'OKX' });
-        });
-    }
+          }
+
+          return {
+            asks: orderbook.asks.map((item: []) => item.splice(0, 2)),
+            bids: orderbook.bids.map((item: []) => item.splice(0, 2)),
+          };
+        },
+        () => {
+          return Promise.reject({ error: 'bad GET request orderbook check', code: -1, ex: 'OKX' });
+        },
+      )
+      .catch(() => {
+        return Promise.reject({ error: 'bad GET request orderbook check', code: -1, ex: 'OKX' });
+      });
+  }
 
   // put orders buy/sell
   // market - 'TON-USDT'

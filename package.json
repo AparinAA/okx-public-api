@@ -1,6 +1,6 @@
 {
   "name": "okx-public-api",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "open api for connect to OKEX",
   "main": "prod/index.js",
   "types": "prod/index.d.ts",
@@ -9,14 +9,16 @@
     "format": "prettier --write \"src/*.ts\" \"src/*.js\"",
     "lint": "tslint -p tsconfig.json",
     "test": "jest --config jestconfig.json",
-    "prepare" : "npm run build",
-    "prepublishOnly" : "npm test && npm run lint",
-    "preversion" : "npm run lint",
-    "version" : "npm run format && git add -A src",
-    "postversion" : "git push && git push --tags"
+    "prepare": "npm run build",
+    "prepublishOnly": "npm test && npm run lint",
+    "preversion": "npm run lint",
+    "version": "npm run format && git add -A src",
+    "postversion": "git push && git push --tags"
   },
   "keywords": [
-    "okx", "api", "client"
+    "okx",
+    "api",
+    "client"
   ],
   "repository": {
     "type": "git",

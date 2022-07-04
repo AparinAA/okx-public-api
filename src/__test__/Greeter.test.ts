@@ -15,24 +15,17 @@ declare global {
 
 dotenv.config({ path: path.resolve(__dirname, '../../.env') });
 
-//Init secret api OKX
-const secretDict_OKX = {
+// Init secret api OKX
+const secretDictOKX = {
     'api_key': process.env.api_key,
     'passphrase': process.env.passphrase,
     'secret_key': process.env.secret_key,
 };
 
-if (!secretDict_OKX.api_key || !secretDict_OKX.secret_key || !secretDict_OKX.secret_key) {
-    console.info("Api key or secret key, or passphrase invalid of OKX");
-    throw "Api key or secret key, or passphrase invalid of OKX";
-}
-const firstEx = new OKXclient(secretDict_OKX.api_key, secretDict_OKX.secret_key, secretDict_OKX.passphrase);
-
-async function check (firstEx: any) {
-    const a = await firstEx.getName();
-    return a; 
+function check (ex: any) {
+    return ex.getName(); 
 } 
 
 test('Check connect API to OKEX', async () => {
-    expect(await check(firstEx)).toBe("OKX");
+    expect(await check(new OKXclient(secretDictOKX.api_key, secretDictOKX.secret_key, secretDictOKX.passphrase))).toBe("OKX");
 })

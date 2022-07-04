@@ -1,35 +1,34 @@
 import axios from 'axios';
 import crypto from 'crypto';
 
-type Order = [number, number]; //Order type: [price, vol]
+type Order = [number, number]; // Order type: [price, vol]
 
-type num = number | string; //number or string (convert to number)
+type num = number | string; // number or string (convert to number)
 
-type balanceInfo = { //balance info on exchange
+type balanceInfo = { // balance info on exchange
     'ccy': string,
     'avail': num,
     'eqUsd': num,
 }
 
-
-interface Orderbook { //Orderbook on exchange, with us balance on exchange
+interface Orderbook { // Orderbook on exchange, with us balance on exchange
     "asks": Order[];
     "bids": Order[];
     "balance": balanceInfo;
 }
 
-//in order to create new OKXclient(api_key, api_secret_key, passphrase)
+// in order to create new OKXclient(api_key, api_secret_key, passphrase)
 export default class OKXclient {
     instance: any;
 
-    constructor(api_key: string, api_secret: string, passphrase: string) {
+    constructor(apiKey: string, apiSecret: string, passphrase: string) {
         this.instance = axios.create({
-            baseURL: 'https://www.okex.com',
+            baseURL: 'https:// www.okex.com',
             timeout: 5000,
             headers: {
                 'accept': 'application/json',
                 'Content-Type': 'application/json; utf-8',
-                "OK-ACCESS-KEY": api_key,
+                "OK-ACCESS-KEY": apiKey,
                 "OK-ACCESS-PASSPHRASE": passphrase,
             }
         });
@@ -48,7 +47,7 @@ export default class OKXclient {
             
             params = new URLSearchParams(params).toString();
 
-            sign = crypto.createHmac("sha256", api_secret)
+            sign = crypto.createHmac("sha256", apiSecret)
                     .update(now + method.toUpperCase() + `${config.url}` + (method === 'GET' ? (params ? `?${params}` : ``) : `${data}`))
                     .digest('base64');
             
@@ -64,7 +63,7 @@ export default class OKXclient {
         return Promise.resolve('OKX');
     }
 
-    //GET request 
+    // GET request 
     getRequest(endpoint: string, params: {} = {}) {
         return this.instance.get(endpoint, { params })
             .then( (result: any) => {
@@ -77,7 +76,7 @@ export default class OKXclient {
             });
     }
 
-    //POST request
+    // POST request
     postRequest(endpoint: string, data: {} = {}) {
         return this.instance.post(endpoint, data)
         .catch( () => {
@@ -85,8 +84,8 @@ export default class OKXclient {
         });
     }
 
-    //Get balance account
-    //return list of object [ {'ccy': ccy, 'avail': amountAvailble, 'eqUsd', equelUsd} ]
+    // Get balance account
+    // return list of object [ {'ccy': ccy, 'avail': amountAvailble, 'eqUsd', equelUsd} ]
     getBalance() {
         interface Details {
             "ccy": string;
@@ -100,7 +99,7 @@ export default class OKXclient {
 
         return this.getRequest('/api/v5/account/balance')
             .then( (balance: any | Balance): balanceInfo | any  => {
-                //console.info("balance:",balance[0]?.details);
+                // console.info("balance:",balance[0]?.details);
                 if (balance?.code === -1) {
                     return Promise.reject({"error": "bad GET request balance check", "code": -1, "ex": "OKX"}); 
                 }
@@ -154,11 +153,11 @@ export default class OKXclient {
         })
     }
 
-    //put orders buy/sell
-    //market - 'TON-USDT'
-    //spot - 'buy/sell'
-    //countOrd - amount orders 
-    //orderList - array orders [[priceOrder1, amountOrder1], [priceOrder2, amountOrder2] , ...]
+    // put orders buy/sell
+    // market - 'TON-USDT'
+    // spot - 'buy/sell'
+    // countOrd - amount orders 
+    // orderList - array orders [[priceOrder1, amountOrder1], [priceOrder2, amountOrder2] , ...]
     putOrders(
         market: string,
         spot: string,
@@ -167,7 +166,7 @@ export default class OKXclient {
     ) {
         const endpoint = "/api/v5/trade/batch-orders";
 
-        let orders: {}[] = [];
+        const orders: {}[] = [];
 
         
         orderList.forEach( (item: [number, number], i: number) => {
@@ -198,34 +197,34 @@ export default class OKXclient {
         })
     }
 
-    //Transfer within account
-    //curryncy - 'TON' , amount - amount (+fee if to main + withdrawal)
-    //TradeAcc = "18"
-    //MainAcc = "6"
+    // Transfer within account
+    // curryncy - 'TON' , amount - amount (+fee if to main + withdrawal)
+    // TradeAcc = "18"
+    // MainAcc = "6"
     transferCurrAcc(
         currency: string,
         amount: number | string,
         from: number | string,
         to: number | string
     ) {
-        //body for transfer within account
-        const body_transfer = {
+        // body for transfer within account
+        const bodyTransfer = {
             "ccy": currency,
             "amt": amount,
             "from": from,
             "to": to
         }
-        return this.postRequest("/api/v5/asset/transfer", body_transfer)
+        return this.postRequest("/api/v5/asset/transfer", bodyTransfer)
         .catch( () => {
             return Promise.reject({"error": "bad POST request transfer", "code": -1, "ex": "OKX"});
         })
     }
-    //Withdrawal from FTX to address
-    //currency - 'TON'
-    //amount - 130
-    //chain - 'TON-TON' (for each currency his own)
-    //address - address for withdrawal (+:tag)
-    //fee - (for each currency his own)
+    // Withdrawal from FTX to address
+    // currency - 'TON'
+    // amount - 130
+    // chain - 'TON-TON' (for each currency his own)
+    // address - address for withdrawal (+:tag)
+    // fee - (for each currency his own)
     withdrawalToAddress (
         currency: string,
         amount: number | string,
@@ -234,8 +233,8 @@ export default class OKXclient {
         address: string
     ) {
 
-        //body for withdrawal
-        const body_withdrawal = {
+        // body for withdrawal
+        const bodyWithdrawal = {
             "amt": "" + amount,
             "fee": fee,
             "dest": "4",
@@ -243,7 +242,7 @@ export default class OKXclient {
             "chain": chain,
             "toAddr": address,
         }
-        return this.postRequest('/api/v5/asset/withdrawal', body_withdrawal)
+        return this.postRequest('/api/v5/asset/withdrawal', bodyWithdrawal)
         .catch( () => {
             return Promise.reject({"error": "bad POST request whidrawal", "code": -1, "ex": "OKX"});
         })

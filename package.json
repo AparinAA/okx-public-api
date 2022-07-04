@@ -1,7 +1,7 @@
 {
   "name": "okx-public-api",
   "version": "1.0.0",
-  "description": "open api for connect OKEX",
+  "description": "open api for connect to OKEX",
   "main": "prod/index.js",
   "types": "prod/index.d.ts",
   "scripts": {
@@ -22,6 +22,10 @@
     "type": "git",
     "url": "git+https://github.com/AparinAA/okx-public-api.git"
   },
+  "bugs": {
+    "url": "https://github.com/AparinAA/okx-public-api.git/issues"
+  },
+  "homepage": "https://github.com/AparinAA/okx-public-api.git#readme",
   "author": "X6P",
   "license": "MIT",
   "devDependencies": {

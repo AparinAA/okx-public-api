@@ -1,12 +1,12 @@
 {
   "name": "okx-public-api",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "description": "open api for connect to OKEX",
   "main": "prod/index.js",
   "types": "prod/index.d.ts",
   "scripts": {
     "build": "tsc",
-    "format": "prettier --write \"src/*.ts\" \"src/*.js\"",
+    "format": "prettier --write \"src/*.ts\"",
     "lint": "tslint -p tsconfig.json",
     "test": "jest --config jestconfig.json",
     "prepare": "npm run build",

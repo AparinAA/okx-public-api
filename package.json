@@ -1,6 +1,6 @@
 {
   "name": "okx-public-api",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "open api for connect to OKEX",
   "main": "prod/index.js",
   "types": "prod/index.d.ts",
@@ -12,7 +12,7 @@
     "prepare": "npm run build",
     "prepublishOnly": "npm test && npm run lint",
     "preversion": "npm run lint",
-    "version": "npm run format && git add -A",
+    "version": "npm run format && git add -A src",
     "postversion": "git push && git push --tags"
   },
   "keywords": [

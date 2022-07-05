@@ -131,7 +131,7 @@ export default class OKXclient {
       });
   }
 
-    /*Get market price with any depth < 400
+  /*Get market price with any depth < 400
     instId='TON-USDT', depth=int
     return object 
     {

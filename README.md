@@ -37,3 +37,33 @@ const okxApi = new OKXclient(apiKey, apiSecret, apiPass);
 }
 ```
 
+`okxApi.putOrders(market, spot, countOrd, orderList)` - put orders buy/sell  
+**market** - 'BTC-USDT'  
+**spot** - 'buy'/'sell'  
+**countOrd** - amount orders  
+**orderList** - array orders [[priceOrder1, amountOrder1], [priceOrder2, amountOrder2] , ...]
+
+```
+    return true/false/Error
+```
+
+`okxApi.transferCurrAcc(currency, amount, from, to)` - Transfer within account  
+**curryncy** - 'BTC'  
+**amount** - amount (+fee if to main + withdrawal)  
+**from**, **to** - code subaccount (*TradeAcc* - "18" *MainAcc* - "6")
+
+```
+    return true/false/Error
+```
+
+`okxApi.withdrawalToAddress(currency, amount, fee, chain, address)` - Withdrawal from FTX to address  
+**currency** - 'BTC'  
+**amount** - 2  
+**chain** - 'BTC-Bitcoin' (for each currency his own)  
+**address** - address for withdrawal (+*:tag*)  
+**fee** - (for each currency his own)
+
+
+```
+    return true/false/Error
+```

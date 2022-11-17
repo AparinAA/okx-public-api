@@ -25,7 +25,7 @@ export default class OKXclient {
 
   constructor(apiKey: string, apiSecret: string, passphrase: string) {
     this.instance = axios.create({
-      baseURL: 'https://www.okex.com',
+      baseURL: 'https://www.okx.com',
       timeout: 5000,
       headers: {
         accept: 'application/json',

@@ -1,7 +1,7 @@
 {
   "name": "okx-public-api",
   "version": "1.0.14",
-  "description": "open api for connect to OKEX",
+  "description": "open api for connect to OKX",
   "main": "prod/index.js",
   "types": "prod/index.d.ts",
   "scripts": {
